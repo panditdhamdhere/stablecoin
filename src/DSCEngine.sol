@@ -2,6 +2,9 @@
 
 pragma solidity ^0.8.19;
 
+import {DecentralizedStableCoin} from "./DecentralizedStableCoin.sol";
+import {ReentrancyGuard} from "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+
 /** 
 * @title DSCEngine
 * @author Pandit Dhamdhere
@@ -20,21 +23,86 @@ pragma solidity ^0.8.19;
 
 */
 
-contract DSCEngine {
+contract DSCEngine is ReentrancyGuard {
+    ///////////////
+    // errors    //
+    ////////////////
+    error DSCEngine__NeedsMoreThanZero();
+    error DSCEngine__TokenAddressesAndPriceFeedAddressesMustBeSameLength();
+    error DSCEngine__NotAllowedToken();
 
-function depositCollateralAndMintDsc() external {}
+    /////////////// ////////
+    // State variables    //
+    //////////////// ///////
 
-function depositCollateral() external {}
+    mapping(address token => address priceFeeds) private s_priceFeeds; //tokenToPriceFeeds;
 
-function redeemCollateralForDsc() external {}
+    DecentralizedStableCoin private immutable i_dsc;
+    ////////////////
+    // modifiers  //
+    ////////////////
+    modifier moreThanZero(uint256 amount) {
+        if (amount == 0) {
+            revert DSCEngine__NeedsMoreThanZero();
+        }
+        _;
+    }
 
-function redeemCollteral() external {}
+    modifier isAllowedToken(address token) {
+        if (s_priceFeeds[token] == address(0)) {
+            revert DSCEngine__NotAllowedToken();
+        }
+        _;
+    }
 
-function mintDsc() external {}
+    ////////////////
+    // functions  //
+    ////////////////
 
-function burnDsc () external {}
+    constructor(
+        address[] memory tokenAddresses,
+        address[] memory priceFeedAddresses,
+        address dscAddress
+    ) {
+        if (tokenAddresses.length != priceFeedAddresses.length) {
+            revert DSCEngine__TokenAddressesAndPriceFeedAddressesMustBeSameLength();
+        }
+        for (uint256 i = 0; i < tokenAddresses.length; i++) {
+            s_priceFeeds[tokenAddresses[i]] = priceFeedAddresses[i];
+        }
+        i_dsc = DecentralizedStableCoin(dscAddress);
+    }
 
-function liquidate() external {}
+    /////////////////////////
+    //  external functions  //
+    //////////////////////////
 
-function getHealthFactor() external view {}
+    function depositCollateralAndMintDsc() external {}
+
+    /*
+     * @param tokenCollateralAddress The Adress of the token to deposit as collateral
+     * @param amountCollateral The amount of collateral to deposit
+     */
+
+    function depositCollateral(
+        address tokenCollateralAddress,
+        uint256 amountCollateral
+    )
+        external
+        moreThanZero(amountCollateral)
+        isAllowedToken(tokenCollateralAddress)
+        nonReentrant
+    {}
+
+    function redeemCollateralForDsc() external {}
+
+    function redeemCollteral() external {}
+
+    function mintDsc() external {}
+
+    function burnDsc() external {}
+
+    function liquidate() external {}
+
+    function getHealthFactor() external view {}
 }
