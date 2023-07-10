@@ -32,7 +32,7 @@ contract DSCEngine is ReentrancyGuard {
     error DSCEngine__TokenAddressesAndPriceFeedAddressesMustBeSameLength();
     error DSCEngine__NotAllowedToken();
     error DSCEngine__TransferFailed();
-    error DscEngine__BreaksHealthFactor();
+    error DSCEngine__BreaksHealthFactor();
 
     //////////////////////////
     // State variables    //
@@ -195,12 +195,12 @@ contract DSCEngine is ReentrancyGuard {
     function _revertIfHealthFactorIsBroken(address user) internal view {
         uint256 userHealthFactor = _healthFactor(user);
         if (userHealthFactor < MIN_HEALTH_FACTOR) {
-            revert DscEngine__BreaksHealthFactor(userHealthFactor);
+            revert DSCEngine__BreaksHealthFactor();
         }
     }
 
     ///////////////////////////////////////////
-    // public and external view functions  //
+    // public and external view functions  ////
     //////////////////////////////////////////
 
     function getAccountCollateralValue(
