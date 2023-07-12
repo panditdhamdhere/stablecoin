@@ -101,7 +101,10 @@ contract DSCEngineTest is Test {
         _;
     }
 
-    function testCanDepositCollateralAndGetAccountInfo() public {
+    function testCanDepositCollateralAndGetAccountInfo()
+        public
+        depositedCollateral
+    {
         (uint256 totalDscMinted, uint256 collateralValueInUsd) = dsce
             .getAccountInformation(USER);
 
