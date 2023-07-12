@@ -44,6 +44,7 @@ contract DSCEngine is ReentrancyGuard {
     uint256 private constant LIQUIDATION_THRESHOLD = 50;
     uint256 private constant LIQUIDATION_PRECISION = 100;
     uint256 private constant MIN_HEALTH_FACTOR = 1e18;
+    uint256 private constant LIQUIDATION_BONUS = 10; // This means 10% of bonus;
 
     mapping(address token => address priceFeeds) private s_priceFeeds; //tokenToPriceFeeds;
     mapping(address user => mapping(address token => uint256 amount))
@@ -254,6 +255,10 @@ contract DSCEngine is ReentrancyGuard {
             collateral,
             debtToCover
         );
+        uint256 bonusCollateral = (tokenAmountFromDebtCovered *
+            LIQUIDATION_BONUS) / LIQUIDATION_PRECISION;
+        uint256 totalCollateralToRedeem = tokenAmountFromDebtCovered +
+            bonusCollateral;
     }
 
     function getHealthFactor() external view {}
@@ -261,6 +266,8 @@ contract DSCEngine is ReentrancyGuard {
     ///////////////////////////////////////////
     // private and internal view functions  //
     //////////////////////////////////////////
+
+    function _redeemCollateral(addresss tokenCollateralAddress, uint256 amountCollateral, address from, address to)
 
     function _getAccountInformation(
         address user
@@ -300,10 +307,18 @@ contract DSCEngine is ReentrancyGuard {
     // public and external view functions  ////
     //////////////////////////////////////////
 
-function getTokenAmountFromUsd(address token, uint256 usdAmountInWei) public view returns (uint256) {
-    AggregatorV3Interface priceFeed = AggregatorV3Interface(s_priceFeeds[token]);
-    (, int256 price,,,) = priceFeed.latestRoundData();
-} 
+    function getTokenAmountFromUsd(
+        address token,
+        uint256 usdAmountInWei
+    ) public view returns (uint256) {
+        AggregatorV3Interface priceFeed = AggregatorV3Interface(
+            s_priceFeeds[token]
+        );
+        (, int256 price, , , ) = priceFeed.latestRoundData();
+        return
+            (usdAmountInWei * PRECISION) /
+            (uint256(price) * ADDITIONAL_FEED_PRECISION);
+    }
 
     function getAccountCollateralValue(
         address user
