@@ -52,7 +52,10 @@ contract Handler is Test {
             address(collateral),
             msg.sender
         );
-        amountCollateral = bound(amountCollateral, 1, maxCollateralRedeem);
+        amountCollateral = bound(amountCollateral, 0, maxCollateralRedeem);
+        if (amountCollateral == 0) {
+            return;
+        }
         dsce.redeemCollateral(address(collateral), amountCollateral);
     }
 
