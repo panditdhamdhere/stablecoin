@@ -25,7 +25,11 @@ contract Handler is Test {
         wbtc = ERC20Mock(collateralTokens[1]);
     }
 
-    // redeem Collateral <-
+    function mintDsc(uint256 amount) public {
+        amount = bound(amount, 1, MAX_DEPOSIT_SIZE);
+        vm.startPrank(msg.sender);
+        dsce.mintDsc(amount);
+    }
 
     function depositCollateral(
         // address collateral,
