@@ -10,7 +10,8 @@
 pragma solidity ^0.8.19;
 
 import {Test} from "forge-std/Test.sol";
-// import {StdInvarients} from "forge-std/StdInvarients.sol";
+import {StdInvariant} from "forge-std/src/StdInvariant.sol";
+
 import {DeployDSC} from "../../script/DeployDSC.s.sol";
 import {DSCEngine} from "../../src/DSCEngine.sol";
 import {DecentralizedStableCoin} from "../../src/DecentralizedStableCoin.sol";
@@ -18,13 +19,13 @@ import {HelperConfig} from "../../script/HelperConfig.s.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {Handler} from "./Handler.t.sol";
 
-contract Invariants is  Test {
+contract InvariantsTest is Test {
     DeployDSC deployer;
     DSCEngine dsce;
     DecentralizedStableCoin dsc;
     HelperConfig config;
-    ERC20 weth;
-    ERC20 wbtc;
+    IERC20 weth;
+    IERC20 wbtc;
     Handler handler;
 
     function setUp() external {
@@ -44,10 +45,10 @@ contract Invariants is  Test {
         uint256 wethValue = dsce.getUsdValue(weth, totalWethDeposited);
         uint256 wbtcValue = dsce.getUsdValue(wbtc, totalBtcDeposited);
 
-        assert(wethValuev + wbtcValue >= totalSupply);
+        assert(wethValue + wbtcValue >= totalSupply);
     }
 
-    function invariant_gettersShouldNotRevert () public view{
+    function invariant_gettersShouldNotRevert() public view {
         dsce.getLiquidationBonus();
         dsce.getPrecision();
     }
