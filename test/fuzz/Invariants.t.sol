@@ -31,7 +31,7 @@ contract InvariantsTest is Test {
     function setUp() external {
         deployer = new DeployDSC();
         (dsc, dsce, config) = deployer.run();
-        (, , IERC20(weth), IERC20(wbtc)) = config.activeNetworkConfig();
+        (, , IERC20(weth_), IERC20(wbtc_)) = config.activeNetworkConfig();
 
         handler = new Handler(dsce, dsc);
         targetContract(address(handler));

@@ -35,7 +35,7 @@ contract Handler is Test {
     }
 
     function mintDsc(uint256 amount, uint256 addressSeed) public {
-        if (userWithCollateralDeposited == 0) {
+        if (userWithCollateralDeposited === 0) {
             return;
         }
 
